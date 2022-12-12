@@ -61,6 +61,7 @@ set(REDIS_BENCHMARK_LIST src/ae.c src/anet.c src/redis-benchmark.c src/adlist.c 
 add_executable(redis-server ${REDIS_SERVER_LIST})
 add_executable(redis-benchmark ${REDIS_BENCHMARK_LIST})
 add_executable(redis-cli ${REDIS_CLI_LIST})
+add_definitions(-fPIC)
 
 # 将目标文件与库文件进行链接
 target_link_libraries(redis-server hdr_histogram hiredis lua ${SHARED_LIBS})
