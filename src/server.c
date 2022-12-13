@@ -6143,7 +6143,7 @@ redisTestProc *getTestProcByName(const char *name) {
     return NULL;
 }
 #endif
-
+// redis-server 入口函数
 int main(int argc, char **argv) {
     struct timeval tv;
     int j;
