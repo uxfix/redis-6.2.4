@@ -6145,7 +6145,7 @@ redisTestProc *getTestProcByName(const char *name) {
 #endif
 // redis-server 入口函数
 int main(int argc, char **argv) {
-    struct timeval tv;
+    struct timeval tv; // 记录当前时间
     int j;
     char config_from_stdin = 0;
 
@@ -6193,12 +6193,18 @@ int main(int argc, char **argv) {
 #ifdef INIT_SETPROCTITLE_REPLACEMENT
     spt_init(argc, argv);
 #endif
+    // 设置本地区域设置的影响范围
+    // 主要影响的是字符串的比较
     setlocale(LC_COLLATE,"");
     tzset(); /* Populates 'timezone' global. */
+    // 设置 redis OOM 时的回调处理函数
     zmalloc_set_oom_handler(redisOutOfMemoryHandler);
+    // 播种由函数 rand 使用的随机数发生器
     srand(time(NULL)^getpid());
     srandom(time(NULL)^getpid());
+    // 获取当前系统时间
     gettimeofday(&tv,NULL);
+    // 根据当前系统时间和进程ID生成伪随机数种子
     init_genrand64(((long long) tv.tv_sec * 1000000 + tv.tv_usec) ^ getpid());
     crc64_init();
 
@@ -6211,7 +6217,11 @@ int main(int argc, char **argv) {
     uint8_t hashseed[16];
     getRandomBytes(hashseed,sizeof(hashseed));
     dictSetHashFunctionSeed(hashseed);
+    // 检查当前启动的redis应用是不是sentinel
+    // 就是判断 argv[0] 是否包含 redis-sentinel
+    // 或者启动参数是否有 --sentinel
     server.sentinel_mode = checkForSentinelMode(argc,argv);
+    // 初始化 redis 配置
     initServerConfig();
     ACLInit(); /* The ACL subsystem must be initialized ASAP because the
                   basic networking code and client creation depends on it. */
